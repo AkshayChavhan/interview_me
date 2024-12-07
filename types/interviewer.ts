@@ -5,6 +5,7 @@ export interface Interviewer {
     section: string;
     subject: string;
     topics: string;
+    instructionsToInterviewer: string;
     interviewType: string;
     phoneNumber: string;
     questionFile?: string;

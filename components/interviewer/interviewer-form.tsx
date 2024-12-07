@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -30,6 +31,7 @@ const formSchema = z.object({
   section: z.string().min(1, "Section is required"),
   subject: z.string().min(2, "Subject must be at least 2 characters"),
   topics: z.string().min(2, "Topics must be at least 2 characters"),
+  instructionsToInterviewer: z.string().min(10, "Instructions must be at least 10 characters"),
   interviewType: z.string(),
   phoneNumber: z.string().regex(/^\d{10}$/, "Invalid phone number"),
   questionFile: z.string().optional(),
@@ -54,15 +56,17 @@ export function InterviewerForm({ interviewer, onClose }: InterviewerFormProps) 
       section: "",
       subject: "",
       topics: "",
+      instructionsToInterviewer: "",
       interviewType: "technical",
       phoneNumber: "",
       questionFile: "",
     },
   });
 
-  function onSubmit(values: FormValues) {
+  async function onSubmit(values: FormValues) {
     if (interviewer?.id) {
       updateInterviewer(interviewer.id, values);
+     
       toast({
         title: "Interviewer updated",
         description: "The interviewer has been successfully updated.",
@@ -76,6 +80,27 @@ export function InterviewerForm({ interviewer, onClose }: InterviewerFormProps) 
     }
     form.reset();
     onClose?.();
+    return 
+    // const response = await axios
+    // .post(
+    //   '/api/openAi',
+    //   {
+    //     name: {`${values.collegeName}-${values.branch}-${values.section}-${values.subject}`},
+    //     tools: [{ type: 'file_search' }],
+    //     model: 'gpt-4o-mini',
+    //     instructions: instructionsToInterviewer
+    //   },
+    //   {
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     }
+    //   }
+    // )
+
+    // if (!response.data || !response.data?.id) {
+    // console.error('Invalid response data');
+    // throw new Error('Failed to create assistant. No response from API.');
+    // }
   }
 
   function onSaveDraft() {
@@ -158,6 +183,23 @@ export function InterviewerForm({ interviewer, onClose }: InterviewerFormProps) 
               <FormControl>
                 <Textarea
                   placeholder="Enter topics (comma separated)"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="instructionsToInterviewer"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instruction to Interviewer</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Share what should be pace of interview..."
                   {...field}
                 />
               </FormControl>
